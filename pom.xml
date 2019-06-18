@@ -9,12 +9,7 @@
 
   <artifactId>reportportal_test_results_collector</artifactId>
 
-  <parent>
-    <groupId>com.capitalone.dashboard</groupId>
-    <artifactId>Hygieia</artifactId>
-    <version>3.0.2-SNAPSHOT</version>
-    <relativePath>../../..</relativePath>
-  </parent>
+  
 
   <distributionManagement>
     <snapshotRepository>
