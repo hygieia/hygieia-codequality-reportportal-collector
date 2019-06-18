@@ -46,7 +46,6 @@ public class ReportPortalCollector extends Collector {
         protoType.setEnabled(true);
         List<String> servers=reportSettings.getServers();
         List<String> niceNames=reportSettings.getNiceNames();
-        //String ProjectName=reportSettings.getProjectName();
         protoType.setProjectName(reportSettings.getProjectName());
         if(servers!=null) {
             protoType.getReportPortalServers().addAll(servers);
@@ -58,13 +57,11 @@ public class ReportPortalCollector extends Collector {
         }
 
         Map<String, Object> allOptions = new HashMap<>();
-        //allOptions.put(ReportPortalProject.INSTANCE_URL,"" );
         allOptions.put(ReportPortalProject.PROJECT_NAME,reportSettings.getProjectName());
         allOptions.put(ReportPortalProject.PROJECT_ID, reportSettings.getProjectName());
         protoType.setAllFields(allOptions);
 
         Map<String, Object> uniqueOptions = new HashMap<>();
-       // uniqueOptions.put(ReportPortalProject.INSTANCE_URL,reportSettings.getInstanceUrl());
         uniqueOptions.put(ReportPortalProject.PROJECT_NAME,reportSettings.getProjectName());
         
         protoType.setUniqueFields(uniqueOptions);
