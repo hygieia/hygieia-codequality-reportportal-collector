@@ -18,7 +18,6 @@ public class ReportPortalSettings {
     private String bearerToken;
     private List<String> niceNames;
     private String projectName;
-	//private String instanceUrl;
     
     public String getProjectName() {
     	return projectName;
