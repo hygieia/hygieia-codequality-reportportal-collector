@@ -29,7 +29,6 @@ public interface ReportResultRepository extends TestResultRepository {
      * @param launchId launch ID
      * @return a ReportResult
      */
-    //ReportResult findByIdAndlaunchId(ObjectId Id, String launchId);
  
     @Query(value = "{ 'testId' : ?0 }")
     ReportResult findBytestId(ObjectId objectId);
