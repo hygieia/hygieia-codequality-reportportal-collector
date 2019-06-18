@@ -192,7 +192,6 @@ public class DefaultReportPortalClient implements ReportPortalClient {
         String url = instanceUrl + "/api/v1/" + projectName +"/item?filter.eq.launch="+ launchId+"&filter.eq.type="+"SUITE";
         LOG.info(url);
         int count=0;
-        //JSONObject testData =new JSONObject();
         try {
 
             for (Object obj : parseAsArray(url,"content")) {
