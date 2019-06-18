@@ -77,18 +77,14 @@ public class ReportPortalCollectorTask extends CollectorTask<ReportPortalCollect
         udId.add(collector.getId());
         List<ReportPortalProject> existingProjects = reportProjectRepository.findByCollectorIdIn(udId);
         List<ReportPortalProject> latestProjects = new ArrayList<>();
-        //clean(collector, existingProjects);
 
         if (!CollectionUtils.isEmpty(collector.getReportPortalServers())) {
             
             for (int i = 0; i < collector.getReportPortalServers().size(); i++) {
 
                 String instanceUrl = collector.getReportPortalServers().get(i);
-                //Double version = collector.getSonarVersions().get(i);
-               // String metrics = collector.getSonarMetrics().get(i);
                 String projectName=collector.getProjectName();
                 logBanner(instanceUrl);
-               //ReportPortalClient reportClient = new ReportPortalClient();
                 List<ReportPortalProject> projects = reportClient.getProjectData(instanceUrl,projectName);
                 latestProjects.addAll(projects);
 
@@ -100,14 +96,12 @@ public class ReportPortalCollectorTask extends CollectorTask<ReportPortalCollect
                 List<ReportPortalProject> projectstoupdate =reportProjectRepository.findByCollectorIdIn(udId);
                 updateReportInfo(projectstoupdate,collector,instanceUrl);
 
-               // refreshData(enabledProjects(collector, instanceUrl), sonarClient,metrics);
                 
                 
 
                 log("Finished", start);
             }
         }
-       // deleteUnwantedJobs(latestProjects, existingProjects, collector);
     }
 
 
@@ -120,22 +114,18 @@ public class ReportPortalCollectorTask extends CollectorTask<ReportPortalCollect
     	for(ReportPortalProject project: projects) {
     		
         	
-    		//String launchId=(String) project.getOptions().get("id");
-    		//ObjectId collectorItemId=project.getId();
+    	
     		List<ReportResult> tests= reportClient.getTestData(collector,project);
     		for(ReportResult test:tests) {
     			Map<String, Object> results=test.getResults();
     			test.setExecutionId(project.getLaunchNumber());
     			
-    			//test.setCollectorItemId(collectorItemId);
     			ReportResult foundTest=reportRepository.findBytestId(test.getTestId());
     			if(foundTest==null) {
-    				//test.setCollectorItemId(project.getId());
     				newTests.add(test);
     				count++;
     			}		
     			else {
-    				//updating test info
     				foundTest.setResults(results);
     				foundTest.setExecutionId(project.getLaunchNumber());
     				foundTest.setTestCapabilities(test.getTestCapabilities());
@@ -145,7 +135,6 @@ public class ReportPortalCollectorTask extends CollectorTask<ReportPortalCollect
     		}
     		
     	}
-    	//save all in one shot
         if (!CollectionUtils.isEmpty(newTests)) {
             reportRepository.save(newTests);
         }
@@ -178,7 +167,6 @@ public class ReportPortalCollectorTask extends CollectorTask<ReportPortalCollect
             }else{
                 int index = existingProjects.indexOf(project);
                 ReportPortalProject s = existingProjects.get(index);
-                //if(StringUtils.isEmpty(s.getNiceName())){
                     s.setNiceName(niceName);
                     s.setLastUpdated(start);
                     Options.put("launchId",project.getLaunchId());
@@ -187,10 +175,9 @@ public class ReportPortalCollectorTask extends CollectorTask<ReportPortalCollect
                    
          
                     updateProjects.add(s);
-              //  }
+             
             }
         }
-        //save all in one shot
         if (!CollectionUtils.isEmpty(newProjects)) {
             reportProjectRepository.save(newProjects);
         }
