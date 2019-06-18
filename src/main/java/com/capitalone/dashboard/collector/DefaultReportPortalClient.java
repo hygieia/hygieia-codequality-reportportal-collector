@@ -81,13 +81,9 @@ public class DefaultReportPortalClient implements ReportPortalClient {
                 JSONObject prjData = (JSONObject) obj;
 
                 ReportPortalProject project = new ReportPortalProject();
-                
-                //project.setInstanceUrl(instanceUrl);
-                
-               // project.setLastUpdated();
+               
                 
 				
-            
                 Map<String, Object> Options = new HashMap<String, Object>(prjData);
                 Options.put("id", str(prjData, ID));
                 Options.put("launchId",str(prjData, ID));
@@ -95,14 +91,12 @@ public class DefaultReportPortalClient implements ReportPortalClient {
                 project.setProjectId(str(prjData, NAME));
                 project.setProjectName(str(prjData, NAME));
                 project.setLaunchNumber(str(prjData,"number"));
-               // project.setLaunchId((str(prjData, ID)));
                 project.setInstanceUrl(instanceUrl);
                 project.setDescription(str(prjData,"description"));
                 projects.add(project);
                 
                 
-				//Map<String, Object> Options = new HashMap<String, Object>(prjData);
-               // project.setOptions(Options);
+				
             }
 
         } catch (ParseException e) {
@@ -128,8 +122,7 @@ public class DefaultReportPortalClient implements ReportPortalClient {
         JSONParser jsonParser = new JSONParser();
         JSONObject jsonObject = (JSONObject) jsonParser.parse(response.getBody());
         LOG.debug(url);
-       // LOG.info(url);
-        //LOG.info(jsonObject.get("error_code"));
+       
    
         return (JSONArray) jsonObject.get(key);
     }
@@ -193,10 +186,7 @@ public class DefaultReportPortalClient implements ReportPortalClient {
 		ReportResult report = new ReportResult();
 		List<TestCapability> caps=new ArrayList<>();
 		List<TestSuite> suites=new ArrayList<>();
-		//List<TestCase> cases=new ArrayList<>();
 		TestCapability cap=new TestCapability();
-		//List<TestCaseStep> steps=new ArrayList<>();
-		//test.setTestCapabilities(caps);
 		String projectName=collector.getProjectName();
 		
         String url = instanceUrl + "/api/v1/" + projectName +"/item?filter.eq.launch="+ launchId+"&filter.eq.type="+"SUITE";
@@ -216,7 +206,6 @@ public class DefaultReportPortalClient implements ReportPortalClient {
               count++;     
             }
             
-            //LOG.info(count);
             
             cap.setDescription(projectName);
             cap.setExecutionId(launchId);
@@ -225,10 +214,8 @@ public class DefaultReportPortalClient implements ReportPortalClient {
             cap.setType(TestSuiteType.Functional);
             caps.add(cap);
             
-            // Map<String, Object> Results = new HashMap<String, Object>(testData);
-           //  report.setResults(Results);
+           
              report.setDescription(projectName);
-             //report.setExecutionId(launchId);
              report.setUrl(instanceUrl+"/ui/#"+projectName+"/launches/all");
              report.setCollectorId(collector.getId());
              report.setTestId(collectorItemId);
@@ -240,21 +227,7 @@ public class DefaultReportPortalClient implements ReportPortalClient {
              report.setStartTime((long)(project.getOptions().get("start_time")));
              report.setEndTime((long)(project.getOptions().get("end_time")));
              reports.add(report);
-                //project.setInstanceUrl(instanceUrl);
-                
-               // project.setLastUpdated();
-               /* test.setDescription(str(testData,"name"));
-				test.setCollectorId(collector.getId());
-				test.setTestId(str(testData,"id"));
-				test.setLaunchId(launchId);
-				test.setName(str(testData,"name"));
-				test.setExecutionId(launchId);
-				
-				tests.add(test);
-				*/
-                
-				//Map<String, Object> Options = new HashMap<String, Object>(prjData);
-               // project.setOptions(Options);
+               
             
 
         } catch (ParseException e) {
@@ -285,12 +258,6 @@ public class DefaultReportPortalClient implements ReportPortalClient {
      		step1.setStatus(getStatus(str(testData,"status")));
      		JSONObject stats=(JSONObject) testData.get("statistics");
      		JSONObject executions=(JSONObject) stats.get("executions");
-     		//step.setFailedTestStepCount((integer(executions,"failed")));
-     		//step.setSuccessTestStepCount(integer(executions,"failed"));
-     		//step.setTotalTestStepCount(integer(executions,"total"));
-     		//step.setSkippedTestStepCount(integer(executions,"skipped"));
-     		//List<TestCaseStep> teststeps=getStepData(str(testData,"id"),str(testData,"launchId"),instanceUrl,projectName);
-     		//step.setTestSteps(teststeps);
              steps.add(step1);
              
              
