@@ -44,7 +44,7 @@ public class DefaultReportPortalClient implements ReportPortalClient {
     private static final Log LOG = LogFactory.getLog(DefaultReportPortalClient.class);
 
     protected static final String URL_RESOURCES = "/api/v1/";
-    
+
     protected static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
     protected static final String ID = "id";
     protected static final String NAME = "name";
@@ -66,7 +66,7 @@ public class DefaultReportPortalClient implements ReportPortalClient {
     public DefaultReportPortalClient(Supplier<RestOperations> restOperationsSupplier, ReportPortalSettings settings) {
         this.httpHeaders = new HttpEntity<String>(
                 this.createHeaders(settings.getBearerToken())
-            );
+        );
         this.rest = restOperationsSupplier.get();
     }
 
@@ -74,16 +74,16 @@ public class DefaultReportPortalClient implements ReportPortalClient {
     public List<ReportPortalProject> getProjectData(String instanceUrl,String projectName) {
         List<ReportPortalProject> projects = new ArrayList<>();
         String url = instanceUrl + URL_RESOURCES + projectName +"/launch/latest?page.sort=name&page.size=100";
-        
+
         try {
 
             for (Object obj : parseAsArray(url,"content")) {
                 JSONObject prjData = (JSONObject) obj;
 
                 ReportPortalProject project = new ReportPortalProject();
-               
-                
-				
+
+
+
                 Map<String, Object> Options = new HashMap<String, Object>(prjData);
                 Options.put("id", str(prjData, ID));
                 Options.put("launchId",str(prjData, ID));
@@ -94,9 +94,9 @@ public class DefaultReportPortalClient implements ReportPortalClient {
                 project.setInstanceUrl(instanceUrl);
                 project.setDescription(str(prjData,"description"));
                 projects.add(project);
-                
-                
-				
+
+
+
             }
 
         } catch (ParseException e) {
@@ -107,12 +107,12 @@ public class DefaultReportPortalClient implements ReportPortalClient {
 
         return projects;
     }
-    
-    
-  
 
 
-	protected JSONArray parseAsArray(String url) throws ParseException {
+
+
+
+    protected JSONArray parseAsArray(String url) throws ParseException {
         ResponseEntity<String> response = rest.exchange(url, HttpMethod.GET, this.httpHeaders, String.class);
         return (JSONArray) new JSONParser().parse(response.getBody());
     }
@@ -122,8 +122,8 @@ public class DefaultReportPortalClient implements ReportPortalClient {
         JSONParser jsonParser = new JSONParser();
         JSONObject jsonObject = (JSONObject) jsonParser.parse(response.getBody());
         LOG.debug(url);
-       
-   
+
+
         return (JSONArray) jsonObject.get(key);
     }
 
@@ -167,186 +167,186 @@ public class DefaultReportPortalClient implements ReportPortalClient {
 
     private final HttpHeaders createHeaders(String bearerToken){
         HttpHeaders headers = new HttpHeaders();
-      //  headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + bearerToken);
-     
-        
+        //  headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + bearerToken);
+
+
         String authHeader = "bearer "+bearerToken;
         headers.set("Authorization", authHeader);
         return headers;
     }
 
-	@Override
-	public List<ReportResult> getTestData(ReportPortalCollector collector, ReportPortalProject project) {
-		// TODO Auto-generated method stub
-		String instanceUrl=project.getInstanceUrl();
-		String launchId=(String) project.getOptions().get("id");
-		LOG.info(launchId);
-		ObjectId collectorItemId=project.getId();
-		List<ReportResult> reports = new ArrayList<>();
-		ReportResult report = new ReportResult();
-		List<TestCapability> caps=new ArrayList<>();
-		List<TestSuite> suites=new ArrayList<>();
-		TestCapability cap=new TestCapability();
-		String projectName=collector.getProjectName();
-		
-        String url = instanceUrl + "/api/v1/" + projectName +"/item?filter.eq.launch="+ launchId+"&filter.eq.type="+"SUITE";
+    @Override
+    public List<ReportResult> getTestData(ReportPortalCollector collector, ReportPortalProject project) {
+        // TODO Auto-generated method stub
+        String instanceUrl=project.getInstanceUrl();
+        String launchId=(String) project.getOptions().get("id");
+        LOG.info(launchId);
+        ObjectId collectorItemId=project.getId();
+        List<ReportResult> reports = new ArrayList<>();
+        ReportResult report = new ReportResult();
+        List<TestCapability> caps=new ArrayList<>();
+        List<TestSuite> suites=new ArrayList<>();
+        TestCapability cap=new TestCapability();
+        String projectName=collector.getProjectName();
+
+        String url = instanceUrl + "/api/v1/" + projectName +"/item?filter.eq.launchId="+ launchId+"&filter.eq.type="+"SUITE";
         LOG.info(url);
         int count=0;
         try {
 
             for (Object obj : parseAsArray(url,"content")) {
-            	JSONObject testData = (JSONObject) obj;
-                 
+                JSONObject testData = (JSONObject) obj;
+
                 LOG.info(str(testData,"name"));
-               TestSuite suite=getTestSuite(testData,instanceUrl,collector);
-                
-               suites.add(suite);
-               
-              count++;     
+                TestSuite suite=getTestSuite(testData,instanceUrl,collector);
+
+                suites.add(suite);
+
+                count++;
             }
-            
-            
+
+
             cap.setDescription(projectName);
             cap.setExecutionId(launchId);
             cap.setToolType("reporting");
             cap.setTestSuites(suites);
             cap.setType(TestSuiteType.Functional);
             caps.add(cap);
-            
-           
-             report.setDescription(projectName);
-             report.setUrl(instanceUrl+"/ui/#"+projectName+"/launches/all");
-             report.setCollectorId(collector.getId());
-             report.setTestId(collectorItemId);
-             report.setExecutionId(launchId);
-             report.setCollectorItemId(project.getId());
-             report.setTestCapabilities(caps);
-             report.setTotalCount(count);
-             report.setDuration((((Double) project.getOptions().get("approximateDuration")).longValue()));
-             report.setStartTime((long)(project.getOptions().get("start_time")));
-             report.setEndTime((long)(project.getOptions().get("end_time")));
-             reports.add(report);
-               
-            
+
+
+            report.setDescription(projectName);
+            report.setUrl(instanceUrl+"/ui/#"+projectName+"/launches/all");
+            report.setCollectorId(collector.getId());
+            report.setTestId(collectorItemId);
+            report.setExecutionId(launchId);
+            report.setCollectorItemId(project.getId());
+            report.setTestCapabilities(caps);
+            report.setTotalCount(count);
+            report.setDuration((((Double) project.getOptions().get("approximateDuration")).longValue()));
+            report.setStartTime((long)(project.getOptions().get("startTime") == null ? Long.valueOf(0) : project.getOptions().get("startTime")));
+            report.setEndTime((long)(project.getOptions().get("endTime") == null ? Long.valueOf(0) : project.getOptions().get("endTime")));
+            reports.add(report);
+
+
 
         } catch (ParseException e) {
             LOG.error("Could not parse response from: " + url, e);
         } catch (RestClientException rce) {
-        	LOG.info("SUITEERROR");
+            LOG.info("SUITEERROR");
             LOG.error(rce);
         }
 
         return reports;
-    
-		
-		
-	}
 
-	private List<TestCaseStep> getStepData(String parent, String launchId, String instanceUrl, String projectName) {
-		// TODO Auto-generated method stub
-		List<TestCaseStep> step=new ArrayList<>();
-		 String step_url = instanceUrl + URL_RESOURCES + projectName +"/item?filter.eq.launch="+launchId+"&filter.eq.type=STEP&filter.eq.parent="+parent;
-	        
-			List<TestCaseStep> steps=new ArrayList<>();
-     try {
 
-         for (Object obj : parseAsArray(step_url,"content")) {
-             JSONObject testData = (JSONObject) obj;
-             TestCaseStep step1=new TestCaseStep();
-     		step1.setDescription(str(testData,"name"));
-     		step1.setStatus(getStatus(str(testData,"status")));
-     		JSONObject stats=(JSONObject) testData.get("statistics");
-     		JSONObject executions=(JSONObject) stats.get("executions");
-             steps.add(step1);
-             
-             
-         }
-     }catch (ParseException e) {
-         LOG.error("Could not parse response from: " + step_url, e);
-     } catch (RestClientException rce) {
-    	 LOG.info("STEP ERROR");
-         LOG.error(rce);
-     }
-         
-         return steps;
-	}
 
-	private List<TestCase> getTestCases(String parent,String launchId,String instanceUrl,String projectName) {
-		// TODO Auto-generated method stub
- String test_url = instanceUrl + URL_RESOURCES + projectName +"/item?filter.eq.launch="+launchId+"&filter.eq.type=TEST&filter.eq.parent="+parent;
-	        
- 				List<TestCase> tests=new ArrayList<>();
-	        try {
-
-	            for (Object obj : parseAsArray(test_url,"content")) {
-	                JSONObject testData = (JSONObject) obj;
-	                TestCase test=new TestCase();
-	        		test.setDescription(str(testData,"name"));
-	        		test.setStatus(getStatus(str(testData,"status")));
-	        		JSONObject stats=(JSONObject) testData.get("statistics");
-	        		JSONObject executions=(JSONObject) stats.get("executions");
-	        		test.setFailedTestStepCount(Integer.parseInt(str(executions,"failed")));
-	        		test.setSuccessTestStepCount(Integer.parseInt(str(executions,"passed")));
-	        		test.setTotalTestStepCount(Integer.parseInt(str(executions,"total")));
-	        		test.setSkippedTestStepCount(Integer.parseInt(str(executions,"skipped")));
-	        		List<TestCaseStep> teststeps=getStepData(str(testData,"id"),str(testData,"launchId"),instanceUrl,projectName);
-	        		test.setTestSteps(teststeps);
-	                tests.add(test);
-	                
-	                
-	            }
-	        }catch (ParseException e) {
-	            LOG.error("Could not parse response from: " + test_url, e);
-	        } catch (RestClientException rce) {
-	        	LOG.info("TESTERROR");
-	            LOG.error(rce);
-	        }
-	            
-	            return tests;
-		
-	}
-
-	
-	
-
-	private TestSuite getTestSuite(JSONObject testData,String instanceUrl,ReportPortalCollector collector) {
-		// TODO Auto-generated method stub
-		TestSuite suite=new TestSuite();
-		suite.setDescription(str(testData,"name"));
-		suite.setStatus(getStatus(str(testData,"status")));
-		
-		suite.setStartTime(Long(testData,"start_time"));
-		suite.setEndTime(Long(testData,"end_time"));
-		JSONObject stats=(JSONObject) testData.get("statistics");
-		JSONObject executions=(JSONObject) stats.get("executions");
-		suite.setFailedTestCaseCount(Integer.parseInt(str(executions,"failed")));
-		suite.setSuccessTestCaseCount(Integer.parseInt(str(executions,"passed")));
-		suite.setTotalTestCaseCount(Integer.parseInt(str(executions,"total")));
-		suite.setSkippedTestCaseCount(Integer.parseInt(str(executions,"skipped")));
-		List<TestCase> testcases=getTestCases(str(testData,"id"),str(testData,"launchId"),instanceUrl,collector.getProjectName());
-		suite.setTestCases(testcases);
-		
-		return suite;
-	}
-
-	private TestCaseStatus getStatus(String str) {
-		// TODO Auto-generated method stub
-		
-		switch (str) {
-        case "PASSED":
-            return TestCaseStatus.Success;
-            
-        case "FAILED":
-        	return TestCaseStatus.Failure;
-           
-        case "SKIPPED":
-        	return TestCaseStatus.Skipped;
-            
-        default:
-        	return TestCaseStatus.Unknown;
     }
-		
-	}
 
-	
+    private List<TestCaseStep> getStepData(String parent, String launchId, String instanceUrl, String projectName) {
+        // TODO Auto-generated method stub
+        List<TestCaseStep> step=new ArrayList<>();
+        String step_url = instanceUrl + URL_RESOURCES + projectName +"/item?filter.eq.launchId="+launchId+"&filter.eq.type=STEP&filter.eq.parentId="+parent;
+
+        List<TestCaseStep> steps=new ArrayList<>();
+        try {
+
+            for (Object obj : parseAsArray(step_url,"content")) {
+                JSONObject testData = (JSONObject) obj;
+                TestCaseStep step1=new TestCaseStep();
+                step1.setDescription(str(testData,"name"));
+                step1.setStatus(getStatus(str(testData,"status")));
+                JSONObject stats=(JSONObject) testData.get("statistics");
+                JSONObject executions=(JSONObject) stats.get("executions");
+                steps.add(step1);
+
+
+            }
+        }catch (ParseException e) {
+            LOG.error("Could not parse response from: " + step_url, e);
+        } catch (RestClientException rce) {
+            LOG.info("STEP ERROR");
+            LOG.error(rce);
+        }
+
+        return steps;
+    }
+
+    private List<TestCase> getTestCases(String parent,String launchId,String instanceUrl,String projectName) {
+        // TODO Auto-generated method stub
+        String test_url = instanceUrl + URL_RESOURCES + projectName +"/item?filter.eq.launchId="+launchId+"&filter.eq.type=TEST&filter.eq.parentId="+parent;
+
+        List<TestCase> tests=new ArrayList<>();
+        try {
+
+            for (Object obj : parseAsArray(test_url,"content")) {
+                JSONObject testData = (JSONObject) obj;
+                TestCase test=new TestCase();
+                test.setDescription(str(testData,"name"));
+                test.setStatus(getStatus(str(testData,"status")));
+                JSONObject stats=(JSONObject) testData.get("statistics");
+                JSONObject executions=(JSONObject) stats.get("executions");
+                test.setFailedTestStepCount(Integer.parseInt(str(executions,"failed") == null ? "0" : str(executions,"failed")));
+                test.setSuccessTestStepCount(Integer.parseInt(str(executions,"passed") == null ? "0" : str(executions,"passed")));
+                test.setTotalTestStepCount(Integer.parseInt(str(executions,"total") == null ? "0" : str(executions,"total")));
+                test.setSkippedTestStepCount(Integer.parseInt(str(executions,"skipped") == null ? "0" : str(executions,"skipped")));
+                List<TestCaseStep> teststeps=getStepData(str(testData,"id"),str(testData,"launchId"),instanceUrl,projectName);
+                test.setTestSteps(teststeps);
+                tests.add(test);
+
+
+            }
+        }catch (ParseException e) {
+            LOG.error("Could not parse response from: " + test_url, e);
+        } catch (RestClientException rce) {
+            LOG.info("TESTERROR");
+            LOG.error(rce);
+        }
+
+        return tests;
+
+    }
+
+
+
+
+    private TestSuite getTestSuite(JSONObject testData,String instanceUrl,ReportPortalCollector collector) {
+        // TODO Auto-generated method stub
+        TestSuite suite=new TestSuite();
+        suite.setDescription(str(testData,"name"));
+        suite.setStatus(getStatus(str(testData,"status")));
+
+        suite.setStartTime(Long(testData,"startTime") == null ? 0 : Long(testData,"startTime"));
+        suite.setEndTime(Long(testData,"endTime") == null ? 0 : Long(testData,"endTime"));
+        JSONObject stats=(JSONObject) testData.get("statistics");
+        JSONObject executions=(JSONObject) stats.get("executions");
+        suite.setFailedTestCaseCount(Integer.parseInt(str(executions,"failed") == null ? "0" : str(executions,"failed")));
+        suite.setSuccessTestCaseCount(Integer.parseInt(str(executions,"passed") == null ? "0" : str(executions,"passed")));
+        suite.setTotalTestCaseCount(Integer.parseInt(str(executions,"total") == null ? "0" : str(executions,"total")));
+        suite.setSkippedTestCaseCount(Integer.parseInt(str(executions,"skipped") == null ? "0" : str(executions,"skipped")));
+        List<TestCase> testcases=getTestCases(str(testData,"id"),str(testData,"launchId"),instanceUrl,collector.getProjectName());
+        suite.setTestCases(testcases);
+
+        return suite;
+    }
+
+    private TestCaseStatus getStatus(String str) {
+        // TODO Auto-generated method stub
+
+        switch (str) {
+            case "PASSED":
+                return TestCaseStatus.Success;
+
+            case "FAILED":
+                return TestCaseStatus.Failure;
+
+            case "SKIPPED":
+                return TestCaseStatus.Skipped;
+
+            default:
+                return TestCaseStatus.Unknown;
+        }
+
+    }
+
+
 }
